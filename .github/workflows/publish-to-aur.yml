@@ -25,6 +25,12 @@ jobs:
         with:
           fetch-depth: 2
 
+      - name: Create publish user
+        run: |
+          useradd -m -G wheel publisher
+          echo '%wheel ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
+          chown -R publisher:publisher "$GITHUB_WORKSPACE"
+
       - name: Find changed package
         id: pkg
         run: |
@@ -51,6 +57,8 @@ jobs:
 
       - name: Setup SSH
         run: |
+          sudo -u publisher bash << 'BASH'
+
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
 
@@ -63,8 +71,12 @@ jobs:
           echo "  IdentityFile ~/.ssh/aur" >> ~/.ssh/config
           echo "  User aur" >> ~/.ssh/config
 
+          BASH
+
       - name: Setup GPG
         run: |
+          sudo -u publisher bash << 'BASH'
+
           mkdir -p ~/.gnupg
           chmod 700 ~/.gnupg
 
@@ -88,33 +100,39 @@ jobs:
 
           echo "GPG key imported: $fingerprint"
 
+          BASH
+
       - name: Setup git identity
         run: |
+          sudo -u publisher bash << 'BASH'
+
           git config --global user.name  "Mohamed Amine Zghal"
           git config --global user.email "medaminezghal@outlook.com"
           git config --global safe.directory "$GITHUB_WORKSPACE"
 
+          BASH
+
       - name: Generate .SRCINFO
         run: |
-          useradd -m srcbuilder
-          chown -R srcbuilder:srcbuilder "$GITHUB_WORKSPACE/${{ steps.pkg.outputs.dir }}"
+          sudo -u publisher bash << 'BASH'
 
-          sudo -u srcbuilder bash -c "
-            cd '$GITHUB_WORKSPACE/${{ steps.pkg.outputs.dir }}'
-            makepkg --printsrcinfo > .SRCINFO
-          "
+          cd '$GITHUB_WORKSPACE/${{ steps.pkg.outputs.dir }}'
+          makepkg --printsrcinfo > .SRCINFO
+
 
           echo "Generated .SRCINFO:"
           cat "$GITHUB_WORKSPACE/${{ steps.pkg.outputs.dir }}/.SRCINFO"
 
+          BASH
+
       - name: Push to AUR
         run: |
+          sudo -u publisher bash << 'BASH'
+
           pkgname="${{ steps.pkg.outputs.pkgname }}"
           pkgver="${{ steps.pkg.outputs.pkgver }}"
           dir="$GITHUB_WORKSPACE/${{ steps.pkg.outputs.dir }}"
           aur_dir="/tmp/aur-$pkgname"
-
-          ssh -vvv -i ~/.ssh/aur aur@aur.archlinux.org
 
           git -c init.defaultBranch=master clone "ssh://aur@aur.archlinux.org/${pkgname}.git" "$aur_dir"
           git config --global safe.directory "$aur_dir"
@@ -146,3 +164,4 @@ jobs:
 
           git push
           echo "Successfully pushed $pkgname $pkgver to AUR."
+          BASH
