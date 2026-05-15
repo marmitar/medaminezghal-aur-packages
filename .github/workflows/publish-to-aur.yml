@@ -137,10 +137,8 @@ jobs:
             exit 0
           fi
 
-          git commit \
-            -S \
-            -m "Update to version $pkgver" \
-            --gpg-sign
+          git -c gpg.program="gpg --batch --pinentry-mode loopback --passphrase ${{ secrets.PASSPHRASE }}" \
+            commit -S -m "Update to version $pkgver"
 
           git push
           echo "Successfully pushed $pkgname $pkgver to AUR."
