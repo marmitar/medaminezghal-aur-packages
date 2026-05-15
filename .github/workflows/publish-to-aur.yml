@@ -15,6 +15,12 @@ jobs:
       options: --privileged
 
     steps:
+      - name: Update system
+        run: pacman -Syu --noconfirm
+
+      - name: Install base tools
+        run: pacman -S --noconfirm --needed git openssh gnupg sudo
+
       - uses: actions/checkout@v4
         with:
           fetch-depth: 2
@@ -105,7 +111,7 @@ jobs:
           dir="$GITHUB_WORKSPACE/${{ steps.pkg.outputs.dir }}"
           aur_dir="/tmp/aur-$pkgname"
 
-          git clone "ssh://aur@aur.archlinux.org/${pkgname}.git" "$aur_dir"
+          git -c init.defaultBranch=master clone "ssh://aur@aur.archlinux.org/${pkgname}.git" "$aur_dir"
           git config --global safe.directory "$aur_dir"
 
           # Copy PKGBUILD and .SRCINFO (always required by AUR)

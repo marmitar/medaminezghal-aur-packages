@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   build:
-    name: makepkg check
+    name: Build Check
     runs-on: ubuntu-latest
     container:
       image: archlinux:base-devel
@@ -21,9 +21,20 @@ jobs:
       pull-requests: write
 
     steps:
+      - name: Update system
+        run: pacman -Syu --noconfirm
+
+      - name: Install base tools
+        run: pacman -S --noconfirm --needed git sudo rust cargo
+
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Fetch base branch
+        run: |
+          git config --global safe.directory "$GITHUB_WORKSPACE"
+          git fetch origin main
 
       - name: Find changed package
         id: pkg
@@ -39,12 +50,6 @@ jobs:
           echo "dir=$dir" >> "$GITHUB_OUTPUT"
           echo "Package to build: $dir"
 
-      - name: Update system
-        run: pacman -Syu --noconfirm
-
-      - name: Install base tools
-        run: pacman -S --noconfirm --needed git sudo rust cargo
-
       - name: Create build user
         run: |
           useradd -m -G wheel builder
@@ -59,12 +64,11 @@ jobs:
           cd paru
           sudo -u builder makepkg -si --noconfirm --needed
 
-      - name: Build package
+      - name: Build & Test package
         run: |
           sudo -u builder paru \
-            -Bi "$GITHUB_WORKSPACE/${{ steps.pkg.outputs.dir }}" \
-            --noconfirm \
-            --removemake
+            -B "$GITHUB_WORKSPACE/${{ steps.pkg.outputs.dir }}" \
+            --noconfirm
 
       - name: Post result comment
         if: always()
@@ -72,9 +76,9 @@ jobs:
         with:
           script: |
             const success = '${{ job.status }}' === 'success';
-            const pkg     = '${{ steps.pkg.outputs.dir }}';
+            const pkg     = '${{ steps.pkg.outputs.dir }}' || 'unknown';
             const icon    = success ? '✅' : '❌';
-            const status  = success ? 'Build passed' : 'Build failed';
+            const status  = success ? 'Build and tests passed' : 'Build or tests failed';
 
             github.rest.issues.createComment({
               owner:        context.repo.owner,
