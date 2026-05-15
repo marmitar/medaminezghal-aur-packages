@@ -25,7 +25,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Find changed package
+      - name: Update system
+        run: pacman -Syu --noconfirm
+
+      - name: Install base tools
+        run: pacman -S --noconfirm --needed git sudo rust cargo
+
+    - name: Find changed package
         id: pkg
         run: |
           dir=$(git diff --name-only "origin/${{ github.base_ref }}...HEAD" \
@@ -38,12 +44,6 @@ jobs:
 
           echo "dir=$dir" >> "$GITHUB_OUTPUT"
           echo "Package to build: $dir"
-
-      - name: Update system
-        run: pacman -Syu --noconfirm
-
-      - name: Install base tools
-        run: pacman -S --noconfirm --needed git sudo rust cargo
 
       - name: Create build user
         run: |
