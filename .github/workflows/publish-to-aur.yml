@@ -96,8 +96,9 @@ jobs:
 
       - name: Generate .SRCINFO
         run: |
-          cd "$GITHUB_WORKSPACE/${{ steps.pkg.outputs.dir }}"
-          makepkg --printsrcinfo > .SRCINFO
+          useradd -m srcbuilder
+          chown -R srcbuilder:srcbuilder "$GITHUB_WORKSPACE/${{ steps.pkg.outputs.dir }}"
+          sudo -u srcbuilder bash -c "cd \"$GITHUB_WORKSPACE/${{ steps.pkg.outputs.dir }}\" && makepkg --printsrcinfo > .SRCINFO"
 
 
           echo "Generated .SRCINFO:"
