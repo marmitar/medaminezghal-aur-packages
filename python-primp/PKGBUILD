@@ -4,7 +4,7 @@
 _name=primp
 pkgname=python-$_name
 pkgver=1.2.3
-pkgrel=1
+pkgrel=2
 pkgdesc='HTTP client that can impersonate web browsers.'
 arch=('x86_64' 'aarch64')
 url='https://github.com/deedy5/primp'
