@@ -109,17 +109,12 @@ jobs:
 
       - name: Push to AUR
         run: |
-          echo "=== SSH config ==="
-          cat ~/.ssh/config || echo "no config"
-          echo "=== known_hosts ==="
-          cat ~/.ssh/known_hosts || echo "no known_hosts"
-          echo "=== SSH key ==="
-          ls -la ~/.ssh/ || echo "no .ssh dir"
-
           pkgname="${{ steps.pkg.outputs.pkgname }}"
           pkgver="${{ steps.pkg.outputs.pkgver }}"
           dir="$GITHUB_WORKSPACE/${{ steps.pkg.outputs.dir }}"
           aur_dir="/tmp/aur-$pkgname"
+
+          ssh -i ~/.ssh/aur -o StrictHostKeyChecking=no aur@aur.archlinux.org
 
           git -c init.defaultBranch=master clone "ssh://aur@aur.archlinux.org/${pkgname}.git" "$aur_dir"
           git config --global safe.directory "$aur_dir"
