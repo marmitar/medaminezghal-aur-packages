@@ -57,7 +57,7 @@ jobs:
 
       - name: Setup SSH
         run: |
-          sudo -u publisher bash << 'BASH'
+          sudo -u publisher bash << "BASH"
 
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
@@ -75,7 +75,7 @@ jobs:
 
       - name: Setup GPG
         run: |
-          sudo -u publisher bash << 'BASH'
+          sudo -u publisher bash << "BASH"
 
           mkdir -p ~/.gnupg
           chmod 700 ~/.gnupg
@@ -104,7 +104,7 @@ jobs:
 
       - name: Setup git identity
         run: |
-          sudo -u publisher bash << 'BASH'
+          sudo -u publisher bash << "BASH"
 
           git config --global user.name  "Mohamed Amine Zghal"
           git config --global user.email "medaminezghal@outlook.com"
@@ -114,7 +114,7 @@ jobs:
 
       - name: Generate .SRCINFO
         run: |
-          sudo -u publisher bash << 'BASH'
+          sudo -u publisher bash << "BASH"
 
           cd "$GITHUB_WORKSPACE/${{ steps.pkg.outputs.dir }}"
           makepkg --printsrcinfo > .SRCINFO
@@ -127,7 +127,7 @@ jobs:
 
       - name: Push to AUR
         run: |
-          sudo -u publisher bash << 'BASH'
+          sudo -u publisher bash << "BASH"
 
           pkgname="${{ steps.pkg.outputs.pkgname }}"
           pkgver="${{ steps.pkg.outputs.pkgver }}"
