@@ -15,6 +15,12 @@ jobs:
       options: --privileged
 
     steps:
+      - name: Update system
+        run: pacman -Syu --noconfirm
+
+      - name: Install base tools
+        run: pacman -S --noconfirm --needed git openssh gnupg sudo
+
       - uses: actions/checkout@v4
         with:
           fetch-depth: 2
