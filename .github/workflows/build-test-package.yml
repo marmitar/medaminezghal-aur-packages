@@ -31,6 +31,9 @@ jobs:
       - name: Install base tools
         run: pacman -S --noconfirm --needed git sudo rust cargo
 
+      - name: Fetch base branch
+        run: git fetch origin main
+
       - name: Find changed package
         id: pkg
         run: |
@@ -72,9 +75,9 @@ jobs:
         with:
           script: |
             const success = '${{ job.status }}' === 'success';
-            const pkg     = '${{ steps.pkg.outputs.dir }}';
+            const pkg     = '${{ steps.pkg.outputs.dir }}' || 'unknown';
             const icon    = success ? '✅' : '❌';
-            const status  = success ? 'Build passed' : 'Build failed';
+            const status  = success ? 'Build and tests passed' : 'Build or tests failed';
 
             github.rest.issues.createComment({
               owner:        context.repo.owner,
