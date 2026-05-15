@@ -31,7 +31,7 @@ jobs:
       - name: Install base tools
         run: pacman -S --noconfirm --needed git sudo rust cargo
 
-    - name: Find changed package
+      - name: Find changed package
         id: pkg
         run: |
           dir=$(git diff --name-only "origin/${{ github.base_ref }}...HEAD" \
