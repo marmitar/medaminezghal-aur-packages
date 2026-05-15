@@ -68,8 +68,7 @@ jobs:
         run: |
           sudo -u builder paru \
             -B "$GITHUB_WORKSPACE/${{ steps.pkg.outputs.dir }}" \
-            --noconfirm \
-            --removemake
+            --noconfirm
 
       - name: Post result comment
         if: always()
