@@ -21,15 +21,15 @@ jobs:
       pull-requests: write
 
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
       - name: Update system
         run: pacman -Syu --noconfirm
 
       - name: Install base tools
         run: pacman -S --noconfirm --needed git sudo rust cargo
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Fetch base branch
         run: git fetch origin main
