@@ -1,0 +1,137 @@
+name: Publish to AUR
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "*/PKGBUILD"
+
+jobs:
+  publish:
+    name: Push to AUR
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux:base-devel
+      options: --privileged
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Find changed package
+        id: pkg
+        run: |
+          dir=$(git diff-tree --no-commit-id -r --name-only HEAD \
+                  -- '*/PKGBUILD' \
+                | head -n1 \
+                | sed 's|/PKGBUILD||')
+
+          [[ -n "$dir" ]] || { echo "::error::No PKGBUILD change detected"; exit 1; }
+          [[ -f "$dir/PKGBUILD" ]] || { echo "::error::$dir/PKGBUILD not found"; exit 1; }
+
+          # Extract pkgname and pkgver from the PKGBUILD for use in later steps
+          pkgname=$(bash -c "source $dir/PKGBUILD && echo \$pkgname")
+          pkgver=$(bash -c "source $dir/PKGBUILD && echo \$pkgver")
+
+          [[ -n "$pkgname" ]] || { echo "::error::Could not read pkgname from PKGBUILD"; exit 1; }
+
+          echo "dir=$dir"         >> "$GITHUB_OUTPUT"
+          echo "pkgname=$pkgname" >> "$GITHUB_OUTPUT"
+          echo "pkgver=$pkgver"   >> "$GITHUB_OUTPUT"
+          echo "Package: $pkgname $pkgver (dir: $dir)"
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/aur
+          chmod 600 ~/.ssh/aur
+
+          ssh-keyscan aur.archlinux.org >> ~/.ssh/known_hosts
+
+          cat >> ~/.ssh/config <<EOF
+          Host aur.archlinux.org
+            IdentityFile ~/.ssh/aur
+            User aur
+          EOF
+
+      - name: Setup GPG
+        run: |
+          echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
+          echo "allow-loopback-pinentry" >> ~/.gnupg/gpg-agent.conf
+
+          echo "${{ secrets.GPG_PRIVATE_KEY }}" \
+            | gpg --batch \
+                  --passphrase "${{ secrets.PASSPHRASE }}" \
+                  --import
+
+          fingerprint=$(gpg --list-secret-keys --keyid-format LONG \
+            | grep sec \
+            | head -n1 \
+            | awk '{print $2}' \
+            | cut -d'/' -f2)
+
+          git config --global user.signingkey "$fingerprint"
+          git config --global commit.gpgsign true
+          git config --global gpg.program gpg
+
+          echo "GPG key imported: $fingerprint"
+
+      - name: Setup git identity
+        run: |
+          git config --global user.name  "Mohamed Amine Zghal"
+          git config --global user.email "medaminezghal@outlook.com"
+          git config --global safe.directory "$GITHUB_WORKSPACE"
+
+      - name: Generate .SRCINFO
+        run: |
+          useradd -m srcbuilder
+          chown -R srcbuilder:srcbuilder "$GITHUB_WORKSPACE/${{ steps.pkg.outputs.dir }}"
+
+          sudo -u srcbuilder bash -c "
+            cd '$GITHUB_WORKSPACE/${{ steps.pkg.outputs.dir }}'
+            makepkg --printsrcinfo > .SRCINFO
+          "
+
+          echo "Generated .SRCINFO:"
+          cat "$GITHUB_WORKSPACE/${{ steps.pkg.outputs.dir }}/.SRCINFO"
+
+      - name: Push to AUR
+        run: |
+          pkgname="${{ steps.pkg.outputs.pkgname }}"
+          pkgver="${{ steps.pkg.outputs.pkgver }}"
+          dir="$GITHUB_WORKSPACE/${{ steps.pkg.outputs.dir }}"
+          aur_dir="/tmp/aur-$pkgname"
+
+          git clone "ssh://aur@aur.archlinux.org/${pkgname}.git" "$aur_dir"
+          git config --global safe.directory "$aur_dir"
+
+          # Copy PKGBUILD and .SRCINFO (always required by AUR)
+          cp "$dir/PKGBUILD"  "$aur_dir/"
+          cp "$dir/.SRCINFO"  "$aur_dir/"
+
+          find "$dir" -maxdepth 1 -type f \
+            ! -name 'PKGBUILD' \
+            ! -name '.SRCINFO' \
+            ! -name '*.pkg.tar.*' \
+            ! -name '*.log' \
+            -exec cp {} "$aur_dir/" \;
+
+          cd "$aur_dir"
+          git add -A
+
+          # Skip push if nothing actually changed (e.g. re-run on non-PKGBUILD merge)
+          if git diff --cached --quiet; then
+            echo "No changes to push to AUR."
+            exit 0
+          fi
+
+          git commit \
+            -S \
+            -m "Update to version $pkgver" \
+            --gpg-sign
+
+          git push
+          echo "Successfully pushed $pkgname $pkgver to AUR."

@@ -1,0 +1,84 @@
+name: PKGBUILD CI
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "*/PKGBUILD"
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: makepkg check
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux:base-devel
+      options: --privileged
+    permissions:
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Find changed package
+        id: pkg
+        run: |
+          dir=$(git diff --name-only "origin/${{ github.base_ref }}...HEAD" \
+                  -- '*/PKGBUILD' \
+                | head -n1 \
+                | sed 's|/PKGBUILD||')
+
+          [[ -n "$dir" ]] || { echo "::error::No PKGBUILD change detected"; exit 1; }
+          [[ -f "$dir/PKGBUILD" ]] || { echo "::error::$dir/PKGBUILD not found"; exit 1; }
+
+          echo "dir=$dir" >> "$GITHUB_OUTPUT"
+          echo "Package to build: $dir"
+
+      - name: Update system
+        run: pacman -Syu --noconfirm
+
+      - name: Install base tools
+        run: pacman -S --noconfirm --needed git sudo rust cargo
+
+      - name: Create build user
+        run: |
+          useradd -m -G wheel builder
+          echo '%wheel ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
+          chown -R builder:builder "$GITHUB_WORKSPACE"
+
+      - name: Install paru
+        run: |
+          cd /tmp
+          git clone --depth=1 https://aur.archlinux.org/paru.git
+          chown -R builder:builder paru
+          cd paru
+          sudo -u builder makepkg -si --noconfirm --needed
+
+      - name: Build package
+        run: |
+          sudo -u builder paru \
+            -Bi "$GITHUB_WORKSPACE/${{ steps.pkg.outputs.dir }}" \
+            --noconfirm \
+            --removemake
+
+      - name: Post result comment
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const success = '${{ job.status }}' === 'success';
+            const pkg     = '${{ steps.pkg.outputs.dir }}';
+            const icon    = success ? '✅' : '❌';
+            const status  = success ? 'Build passed' : 'Build failed';
+
+            github.rest.issues.createComment({
+              owner:        context.repo.owner,
+              repo:         context.repo.repo,
+              issue_number: context.issue.number,
+              body: `## ${icon} PKGBUILD CI — ${status}\n\n**Package:** \`${pkg}\`\n*Commit: ${{ github.sha }}*`
+            });
