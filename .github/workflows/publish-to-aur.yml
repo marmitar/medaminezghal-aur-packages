@@ -111,7 +111,7 @@ jobs:
           dir="$GITHUB_WORKSPACE/${{ steps.pkg.outputs.dir }}"
           aur_dir="/tmp/aur-$pkgname"
 
-          git clone "ssh://aur@aur.archlinux.org/${pkgname}.git" "$aur_dir"
+          git -c init.defaultBranch=master clone "ssh://aur@aur.archlinux.org/${pkgname}.git" "$aur_dir"
           git config --global safe.directory "$aur_dir"
 
           # Copy PKGBUILD and .SRCINFO (always required by AUR)
