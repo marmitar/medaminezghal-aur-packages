@@ -111,6 +111,8 @@ jobs:
           dir="$GITHUB_WORKSPACE/${{ steps.pkg.outputs.dir }}"
           aur_dir="/tmp/aur-$pkgname"
 
+          ssh -vvv -i ~/.ssh/aur aur@aur.archlinux.org
+
           git -c init.defaultBranch=master clone "ssh://aur@aur.archlinux.org/${pkgname}.git" "$aur_dir"
           git config --global safe.directory "$aur_dir"
 
