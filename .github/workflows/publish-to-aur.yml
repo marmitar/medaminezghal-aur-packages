@@ -116,7 +116,7 @@ jobs:
         run: |
           sudo -u publisher bash << 'BASH'
 
-          cd '$GITHUB_WORKSPACE/${{ steps.pkg.outputs.dir }}'
+          cd "$GITHUB_WORKSPACE/${{ steps.pkg.outputs.dir }}"
           makepkg --printsrcinfo > .SRCINFO
 
 
