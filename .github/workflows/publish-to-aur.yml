@@ -60,10 +60,10 @@ jobs:
           ssh-keyscan -t rsa aur.archlinux.org >> ~/.ssh/known_hosts
 
           cat >> ~/.ssh/config <<EOF
-          Host aur.archlinux.org
-            IdentityFile ~/.ssh/aur
-            User aur
-          EOF
+Host aur.archlinux.org
+  IdentityFile ~/.ssh/aur
+  User aur
+EOF
 
       - name: Setup GPG
         run: |
