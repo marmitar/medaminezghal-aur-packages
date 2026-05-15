@@ -43,3 +43,4 @@ package(){
   install -d "$pkgdir"/usr/share/licenses/$pkgname
   ln -s "$site_packages"/$_name-$pkgver.dist-info/licenses/LICENSE "$pkgdir"/usr/share/licenses/$pkgname/LICENSE
 }
+# trigger
