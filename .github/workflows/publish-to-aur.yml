@@ -91,6 +91,12 @@ jobs:
           git config --global commit.gpgsign true
           git config --global gpg.program gpg
 
+          keygrip=$(gpg --list-secret-keys --with-keygrip \
+            | grep Keygrip \
+            | head -n1 \
+            | awk '{print $3}')
+          /usr/lib/gnupg/gpg-preset-passphrase --preset "$keygrip" <<< "${{ secrets.PASSPHRASE }}"
+
           echo "GPG key imported: $fingerprint"
 
       - name: Setup git identity
@@ -137,8 +143,10 @@ jobs:
             exit 0
           fi
 
-          git -c gpg.program="gpg --batch --pinentry-mode loopback --passphrase ${{ secrets.PASSPHRASE }}" \
-            commit -S -m "Update to version $pkgver"
+          git commit \
+            -S \
+            -m "Update to version $pkgver" \
+            --gpg-sign
 
           git push
           echo "Successfully pushed $pkgname $pkgver to AUR."
