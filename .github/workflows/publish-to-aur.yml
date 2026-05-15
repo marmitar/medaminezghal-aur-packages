@@ -63,6 +63,11 @@ jobs:
           echo "  IdentityFile /root/.ssh/aur" >> /root/.ssh/config
           echo "  User aur" >> /root/.ssh/config
 
+          eval $(ssh-agent)
+          echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> $GITHUB_ENV
+          echo "SSH_AGENT_PID=$SSH_AGENT_PID" >> $GITHUB_ENV
+          ssh-add /root/.ssh/aur <<< "${{ secrets.PASSPHRASE }}"
+
       - name: Setup GPG
         run: |
           mkdir -p /root/.gnupg
@@ -110,8 +115,6 @@ jobs:
           pkgver="${{ steps.pkg.outputs.pkgver }}"
           dir="$GITHUB_WORKSPACE/${{ steps.pkg.outputs.dir }}"
           aur_dir="/tmp/aur-$pkgname"
-
-          ssh -vvv -i ~/.ssh/aur aur@aur.archlinux.org
 
           git -c init.defaultBranch=master clone "ssh://aur@aur.archlinux.org/${pkgname}.git" "$aur_dir"
           git config --global safe.directory "$aur_dir"
