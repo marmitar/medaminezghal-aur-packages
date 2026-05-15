@@ -29,6 +29,7 @@ jobs:
         id: pkg
         run: |
           git config --global safe.directory "$GITHUB_WORKSPACE"
+
           dir=$(git diff-tree --no-commit-id -r --name-only HEAD^1 HEAD \
                   -- '*/PKGBUILD' \
                 | head -n1 \
@@ -66,6 +67,9 @@ jobs:
 
       - name: Setup GPG
         run: |
+          mkdir -p ~/.gnupg
+          chmod 700 ~/.gnupg
+
           echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
           echo "allow-loopback-pinentry" >> ~/.gnupg/gpg-agent.conf
 
