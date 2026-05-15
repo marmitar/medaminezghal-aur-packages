@@ -32,7 +32,9 @@ jobs:
           fetch-depth: 0
 
       - name: Fetch base branch
-        run: git fetch origin main
+        run: |
+          git config --global safe.directory "$GITHUB_WORKSPACE"
+          git fetch origin main
 
       - name: Find changed package
         id: pkg
