@@ -29,7 +29,6 @@ jobs:
         id: pkg
         run: |
           git config --global safe.directory "$GITHUB_WORKSPACE"
-
           dir=$(git diff-tree --no-commit-id -r --name-only HEAD \
                   -- '*/PKGBUILD' \
                 | head -n1 \
