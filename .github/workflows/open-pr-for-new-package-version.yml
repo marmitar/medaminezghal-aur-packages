@@ -122,7 +122,7 @@ jobs:
         if: steps.resolve.outputs.skip == 'false'
         uses: peter-evans/create-pull-request@v6
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PAT }}
           branch: bump/${{ steps.resolve.outputs.pkgname }}-${{ steps.resolve.outputs.pkgver }}
           commit-message: "${{ steps.resolve.outputs.pkgname }}: Update to version ${{ steps.resolve.outputs.pkgver }}"
           title: "Update ${{ steps.resolve.outputs.pkgname }} to version ${{ steps.resolve.outputs.pkgver }}"
