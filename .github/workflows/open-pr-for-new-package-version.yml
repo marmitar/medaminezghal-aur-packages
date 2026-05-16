@@ -97,6 +97,7 @@ jobs:
           new_checksums=$(sudo -u tmpbuilder bash -c "cd \"$tmpdir\" && makepkg -g")
           [[ -n "$new_checksums" ]] || { echo "::error::makepkg -g failed"; exit 1; }
 
+          cd "$pkgdir"
           awk -v new="$new_checksums" '
             /^sha[0-9a-z]*sums(_[a-z0-9_]+)?=/ {
               if (!inserted) {
