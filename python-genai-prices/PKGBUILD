@@ -15,6 +15,15 @@ optdepends=('pydantic-settings: cli' 'python-rich: cli' 'python-rich-argparse: c
 source=("$url/archive/refs/tags/v$pkgver.tar.gz")
 sha256sums=('7003f53f694eace3e561fb2b89d395db4d409f732f5bb0d292dd632fa00324b8')
 
+prepare() {
+  # Fix ValidationError
+  cd "$srcdir"/$_name-$pkgver
+  sed -i 's/no_color/color/g' packages/python/genai_prices/_cli_impl.py
+  sed -i 's/no-color/color/g' packages/python/genai_prices/_cli_impl.py
+  sed -i '137s/False/True/' packages/python/genai_prices/_cli_impl.py
+  sed -i 's/not args.color/args.color/g' packages/python/genai_prices/_cli_impl.py
+}
+
 build() {
     cd "$srcdir"/$_name-$pkgver/packages/python
     python -m build --wheel --no-isolation --skip-dependency-check
@@ -32,6 +41,7 @@ check() {
   python -m venv --system-site-packages test-env
   cp -f prices/data.schema.json test-env/lib/python$python_version/data.schema.json
   cp -f prices/data.json test-env/lib/python$python_version/data.json
+  cp -f prices/data_slim.json test-env/lib/python$python_version/data_slim.json
   test-env/bin/python -m installer packages/python/dist/*.whl
   test-env/bin/python -m installer prices/dist/*.whl
   test-env/bin/python -m pytest "${pytest_options[@]}" tests
