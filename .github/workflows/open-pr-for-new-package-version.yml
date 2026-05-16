@@ -113,6 +113,7 @@ jobs:
             }
             { print }
           ' PKGBUILD > PKGBUILD.tmp && mv PKGBUILD.tmp PKGBUILD
+
           echo "Updated PKGBUILD:"
           grep -E '^(pkgver|pkgrel|sha[0-9a-z]*sums)' PKGBUILD
 
