@@ -1,0 +1,137 @@
+name: Open PR on New Release
+
+on:
+  repository_dispatch:
+    types: [new-release]
+
+jobs:
+  open-pr:
+    name: Bump package
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux:base-devel
+      options: --privileged
+
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Update system
+        run: pacman -Syu --noconfirm
+
+      - name: Install base tools
+        run: pacman -S --noconfirm --needed git sudo curl
+
+      - uses: actions/checkout@v4
+
+      - name: Setup git identity
+        run: |
+          git config --global user.name  "Mohamed Amine Zghal"
+          git config --global user.email "medaminezghal@outlook.com"
+          git config --global safe.directory "$GITHUB_WORKSPACE"
+
+      - name: Resolve package name
+        id: resolve
+        run: |
+          provider="${{ github.event.client_payload.provider }}"
+          project="${{ github.event.client_payload.project }}"
+          version="${{ github.event.client_payload.version }}"
+
+          pkgver="${version#v}"
+
+          if [[ "$pkgver" =~ [a-zA-Z] ]]; then
+            echo "Skipping pre-release version: $pkgver"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          case "$provider" in
+            pypi)   pkgname="python-$project" ;;
+            github) pkgname="${project##*/}" ;;
+            *)
+              echo "::error::Unsupported provider: $provider"
+              exit 1
+              ;;
+          esac
+
+          if [[ ! -d "$pkgname" || ! -f "$pkgname/PKGBUILD" ]]; then
+            echo "Package '$pkgname' not in repo yet, skipping."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "skip=false"    >> "$GITHUB_OUTPUT"
+          echo "pkgname=$pkgname" >> "$GITHUB_OUTPUT"
+          echo "pkgver=$pkgver"   >> "$GITHUB_OUTPUT"
+          echo "provider=$provider" >> "$GITHUB_OUTPUT"
+          echo "Resolved: $pkgname $pkgver (provider: $provider)"
+
+      - name: Bump version and update checksums
+        id: bump
+        if: steps.resolve.outputs.skip == 'false'
+        run: |
+          pkgname="${{ steps.resolve.outputs.pkgname }}"
+          pkgver="${{ steps.resolve.outputs.pkgver }}"
+          pkgdir="$GITHUB_WORKSPACE/$pkgname"
+
+          current_pkgver=$(bash -c "source $pkgdir/PKGBUILD && echo \$pkgver")
+          current_pkgrel=$(bash -c "source $pkgdir/PKGBUILD && echo \$pkgrel")
+
+          if [[ "$pkgver" == "$current_pkgver" ]]; then
+            new_pkgrel=$((current_pkgrel + 1))
+            sed -i "s/^pkgrel=.*/pkgrel=$new_pkgrel/" "$pkgdir/PKGBUILD"
+            echo "bump_type=checksum" >> "$GITHUB_OUTPUT"
+            echo "Same version, incrementing pkgrel to $new_pkgrel"
+          else
+            sed -i "s/^pkgver=.*/pkgver=$pkgver/" "$pkgdir/PKGBUILD"
+            sed -i "s/^pkgrel=.*/pkgrel=1/"       "$pkgdir/PKGBUILD"
+            echo "bump_type=version" >> "$GITHUB_OUTPUT"
+            echo "New version: $current_pkgver → $pkgver"
+          fi
+
+          cd "$pkgdir"
+          new_checksums=$(makepkg -g 2>/dev/null)
+          [[ -n "$new_checksums" ]] || { echo "::error::makepkg -g failed"; exit 1; }
+
+          awk -v new="$new_checksums" '
+            /^sha[0-9a-z]*sums(_[a-z0-9_]+)?=/ {
+              if (!inserted) {
+                print new
+                inserted=1
+              }
+              in_block=1
+              next
+            }
+            in_block {
+              if (/^\)/) in_block=0
+              next
+            }
+            { print }
+          ' PKGBUILD > PKGBUILD.tmp && mv PKGBUILD.tmp PKGBUILD
+
+          echo "Updated PKGBUILD:"
+          grep -E '^(pkgver|pkgrel|sha[0-9a-z]*sums)' PKGBUILD
+
+      - name: Create pull request
+        if: steps.resolve.outputs.skip == 'false'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: bump/${{ steps.resolve.outputs.pkgname }}-${{ steps.resolve.outputs.pkgver }}
+          commit-message: "${{ steps.resolve.outputs.pkgname }}: Update to version ${{ steps.resolve.outputs.pkgver }}"
+          title: "Update ${{ steps.resolve.outputs.pkgname }} to version ${{ steps.resolve.outputs.pkgver }}"
+          body: |
+            Automated version bump triggered by newreleases.io
+
+            | Field | Value |
+            |---|---|
+            | Package | `${{ steps.resolve.outputs.pkgname }}` |
+            | Provider | `${{ steps.resolve.outputs.provider }}` |
+            | New version | `${{ steps.resolve.outputs.pkgver }}` |
+            | Bump type | `${{ steps.bump.outputs.bump_type }}` |
+            | Release time | `${{ github.event.client_payload.time }}` |
+
+            The PKGBUILD CI will run automatically on this PR.
+          labels: automated, version-bump
+          delete-branch: true

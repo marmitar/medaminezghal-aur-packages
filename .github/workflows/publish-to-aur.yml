@@ -113,10 +113,6 @@ jobs:
           chown -R srcbuilder:srcbuilder "$GITHUB_WORKSPACE/${{ steps.pkg.outputs.dir }}"
           sudo -u srcbuilder bash -c "cd \"$GITHUB_WORKSPACE/${{ steps.pkg.outputs.dir }}\" && makepkg --printsrcinfo > .SRCINFO"
 
-
-          echo "Generated .SRCINFO:"
-          cat "$GITHUB_WORKSPACE/${{ steps.pkg.outputs.dir }}/.SRCINFO"
-
       - name: Push to AUR
         run: |
           pkgname="${{ steps.pkg.outputs.pkgname }}"
@@ -145,9 +141,10 @@ jobs:
             exit 0
           fi
 
+          commit_msg=$(git log -1 --pretty=%s | sed 's/^[^:]*: //')
           git commit \
             -S \
-            -m "Update to version $pkgver" \
+            -m "$commit_msg" \
             --gpg-sign
 
           git push
