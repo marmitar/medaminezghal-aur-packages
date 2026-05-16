@@ -21,42 +21,9 @@ jobs:
         run: pacman -Syu --noconfirm
 
       - name: Install base tools
-        run: pacman -S --noconfirm --needed git gnupg sudo curl
+        run: pacman -S --noconfirm --needed git sudo curl
 
       - uses: actions/checkout@v5
-
-      - name: Setup GPG
-        run: |
-          mkdir -p /root/.gnupg
-          chmod 700 /root/.gnupg
-
-          echo "pinentry-mode loopback" >> /root/.gnupg/gpg.conf
-          echo "allow-loopback-pinentry" >> /root/.gnupg/gpg-agent.conf
-
-          echo "${{ secrets.GPG_PRIVATE_KEY }}" \
-            | gpg --batch \
-                  --passphrase "${{ secrets.PASSPHRASE }}" \
-                  --import
-
-          fingerprint=$(gpg --list-secret-keys --keyid-format LONG \
-            | grep sec \
-            | head -n1 \
-            | awk '{print $2}' \
-            | cut -d'/' -f2)
-
-          git config --global user.signingkey "$fingerprint"
-          git config --global commit.gpgsign true
-          git config --global gpg.program gpg
-
-          gpgconf --kill gpg-agent
-          gpg-agent --daemon --allow-preset-passphrase --allow-loopback-pinentry
-          keygrip=$(gpg --list-secret-keys --with-keygrip \
-            | grep Keygrip \
-            | head -n1 \
-            | awk '{print $3}')
-          /usr/lib/gnupg/gpg-preset-passphrase --preset "$keygrip" <<< "${{ secrets.PASSPHRASE }}"
-
-          echo "GPG key imported: $fingerprint"
 
       - name: Setup git identity
         run: |
