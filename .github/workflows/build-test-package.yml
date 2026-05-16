@@ -57,12 +57,14 @@ jobs:
           echo "Package to build: $dir"
 
       - name: Create build user
+        if: steps.pkg.outputs.skip != 'true'
         run: |
           useradd -m -G wheel builder
           echo '%wheel ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
           chown -R builder:builder "$GITHUB_WORKSPACE"
 
       - name: Install paru
+        if: steps.pkg.outputs.skip != 'true'
         run: |
           cd /tmp
           git clone --depth=1 https://aur.archlinux.org/paru.git
@@ -71,6 +73,7 @@ jobs:
           sudo -u builder makepkg -si --noconfirm --needed
 
       - name: Build & Test package
+        if: steps.pkg.outputs.skip != 'true'
         run: |
           sudo -u builder paru \
             -B "$GITHUB_WORKSPACE/${{ steps.pkg.outputs.dir }}" \
