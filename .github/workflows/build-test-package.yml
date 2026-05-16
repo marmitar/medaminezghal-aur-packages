@@ -67,7 +67,8 @@ jobs:
         if: steps.pkg.outputs.skip != 'true'
         run: |
           cd /tmp
-          git clone --depth=1 https://aur.archlinux.org/paru.git
+          git clone --depth=1 https://aur.archlinux.org/paru.git || \
+          git clone --depth=1 https://github.com/archlinux/aur.git --branch paru --single-branch paru
           chown -R builder:builder paru
           cd paru
           sudo -u builder makepkg -si --noconfirm --needed
