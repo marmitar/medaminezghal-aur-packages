@@ -118,6 +118,11 @@ jobs:
           echo "Updated PKGBUILD:"
           grep -E '^(pkgver|pkgrel|sha[0-9a-z]*sums)' PKGBUILD
 
+      - name: Setup git identity
+        run: |
+          git config --global user.name  "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
       - name: Create pull request
         if: steps.resolve.outputs.skip == 'false'
         uses: peter-evans/create-pull-request@v6
