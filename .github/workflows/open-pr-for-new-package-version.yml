@@ -23,7 +23,7 @@ jobs:
       - name: Install base tools
         run: pacman -S --noconfirm --needed git sudo curl
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Setup git identity
         run: |
@@ -118,11 +118,16 @@ jobs:
           echo "Updated PKGBUILD:"
           grep -E '^(pkgver|pkgrel|sha[0-9a-z]*sums)' PKGBUILD
 
+      - name: Setup git identity
+        run: |
+          git config --global user.name  "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
       - name: Create pull request
         if: steps.resolve.outputs.skip == 'false'
         uses: peter-evans/create-pull-request@v6
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PAT }}
           branch: bump/${{ steps.resolve.outputs.pkgname }}-${{ steps.resolve.outputs.pkgver }}
           commit-message: "${{ steps.resolve.outputs.pkgname }}: Update to version ${{ steps.resolve.outputs.pkgver }}"
           title: "Update ${{ steps.resolve.outputs.pkgname }} to version ${{ steps.resolve.outputs.pkgver }}"
