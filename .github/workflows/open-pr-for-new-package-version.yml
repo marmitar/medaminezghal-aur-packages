@@ -91,7 +91,9 @@ jobs:
           fi
 
           cd "$pkgdir"
-          new_checksums=$(makepkg -g)
+          chown -R tmpbuilder:tmpbuilder "$pkgdir"
+          useradd -m tmpbuilder
+          new_checksums=$(sudo -u tmpbuilder makepkg -g)
           [[ -n "$new_checksums" ]] || { echo "::error::makepkg -g failed"; exit 1; }
 
           awk -v new="$new_checksums" '
