@@ -22,6 +22,7 @@ prepare() {
   sed -i 's/no-color/color/g' packages/python/genai_prices/_cli_impl.py
   sed -i '137s/False/True/' packages/python/genai_prices/_cli_impl.py
   sed -i 's/not args.color/args.color/g' packages/python/genai_prices/_cli_impl.py
+  sed -i 's/--no-color/--color/g' tests/test_cli.py
 }
 
 build() {
