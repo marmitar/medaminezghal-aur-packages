@@ -23,7 +23,7 @@ jobs:
       - name: Install base tools
         run: pacman -S --noconfirm --needed git sudo curl
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Setup git identity
         run: |
