@@ -90,10 +90,11 @@ jobs:
             echo "New version: $current_pkgver → $pkgver"
           fi
 
-          cd "$pkgdir"
+          tmpdir=$(mktemp -d)
+          cp "$pkgdir/PKGBUILD" "$tmpdir/"
           useradd -m tmpbuilder
           chown -R tmpbuilder:tmpbuilder "$pkgdir"
-          new_checksums=$(sudo -u tmpbuilder makepkg -g)
+          new_checksums=$(sudo -u tmpbuilder bash -c "cd \"$tmpdir\" && makepkg -g")
           [[ -n "$new_checksums" ]] || { echo "::error::makepkg -g failed"; exit 1; }
 
           awk -v new="$new_checksums" '
@@ -103,15 +104,15 @@ jobs:
                 inserted=1
               }
               in_block=1
+              if (/\)$/) in_block=0
               next
             }
             in_block {
-              if (/^\)/) in_block=0
+              if (/\)/) in_block=0
               next
             }
             { print }
           ' PKGBUILD > PKGBUILD.tmp && mv PKGBUILD.tmp PKGBUILD
-
           echo "Updated PKGBUILD:"
           grep -E '^(pkgver|pkgrel|sha[0-9a-z]*sums)' PKGBUILD
 
