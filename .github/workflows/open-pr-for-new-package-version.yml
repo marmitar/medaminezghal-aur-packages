@@ -91,8 +91,8 @@ jobs:
           fi
 
           cd "$pkgdir"
-          chown -R tmpbuilder:tmpbuilder "$pkgdir"
           useradd -m tmpbuilder
+          chown -R tmpbuilder:tmpbuilder "$pkgdir"
           new_checksums=$(sudo -u tmpbuilder makepkg -g)
           [[ -n "$new_checksums" ]] || { echo "::error::makepkg -g failed"; exit 1; }
 
