@@ -21,9 +21,42 @@ jobs:
         run: pacman -Syu --noconfirm
 
       - name: Install base tools
-        run: pacman -S --noconfirm --needed git sudo curl
+        run: pacman -S --noconfirm --needed git gnupg sudo curl
 
       - uses: actions/checkout@v5
+
+      - name: Setup GPG
+        run: |
+          mkdir -p /root/.gnupg
+          chmod 700 /root/.gnupg
+
+          echo "pinentry-mode loopback" >> /root/.gnupg/gpg.conf
+          echo "allow-loopback-pinentry" >> /root/.gnupg/gpg-agent.conf
+
+          echo "${{ secrets.GPG_PRIVATE_KEY }}" \
+            | gpg --batch \
+                  --passphrase "${{ secrets.PASSPHRASE }}" \
+                  --import
+
+          fingerprint=$(gpg --list-secret-keys --keyid-format LONG \
+            | grep sec \
+            | head -n1 \
+            | awk '{print $2}' \
+            | cut -d'/' -f2)
+
+          git config --global user.signingkey "$fingerprint"
+          git config --global commit.gpgsign true
+          git config --global gpg.program gpg
+
+          gpgconf --kill gpg-agent
+          gpg-agent --daemon --allow-preset-passphrase --allow-loopback-pinentry
+          keygrip=$(gpg --list-secret-keys --with-keygrip \
+            | grep Keygrip \
+            | head -n1 \
+            | awk '{print $3}')
+          /usr/lib/gnupg/gpg-preset-passphrase --preset "$keygrip" <<< "${{ secrets.PASSPHRASE }}"
+
+          echo "GPG key imported: $fingerprint"
 
       - name: Setup git identity
         run: |
@@ -115,17 +148,9 @@ jobs:
             { print }
           ' PKGBUILD > PKGBUILD.tmp && mv PKGBUILD.tmp PKGBUILD
 
-          echo "Updated PKGBUILD:"
-          grep -E '^(pkgver|pkgrel|sha[0-9a-z]*sums)' PKGBUILD
-
-      - name: Setup git identity
-        run: |
-          git config --global user.name  "Mohamed Amine Zghal"
-          git config --global user.email "medaminezghal@outlook.com"
-
       - name: Create pull request
         if: steps.resolve.outputs.skip == 'false'
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ secrets.PAT }}
           branch: bump/${{ steps.resolve.outputs.pkgname }}-${{ steps.resolve.outputs.pkgver }}
