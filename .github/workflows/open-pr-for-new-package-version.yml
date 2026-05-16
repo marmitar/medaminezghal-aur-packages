@@ -6,7 +6,7 @@ on:
 
 jobs:
   open-pr:
-    name: Bump package
+    name: Bump package version
     runs-on: ubuntu-latest
     container:
       image: archlinux:base-devel
@@ -91,7 +91,7 @@ jobs:
           fi
 
           cd "$pkgdir"
-          new_checksums=$(makepkg -g 2>/dev/null)
+          new_checksums=$(makepkg -g)
           [[ -n "$new_checksums" ]] || { echo "::error::makepkg -g failed"; exit 1; }
 
           awk -v new="$new_checksums" '
