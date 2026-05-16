@@ -93,7 +93,7 @@ jobs:
           tmpdir=$(mktemp -d)
           cp "$pkgdir/PKGBUILD" "$tmpdir/"
           useradd -m tmpbuilder
-          chown -R tmpbuilder:tmpbuilder "$pkgdir"
+          chown -R tmpbuilder:tmpbuilder "$tmpdir"
           new_checksums=$(sudo -u tmpbuilder bash -c "cd \"$tmpdir\" && makepkg -g")
           [[ -n "$new_checksums" ]] || { echo "::error::makepkg -g failed"; exit 1; }
 
