@@ -1,4 +1,4 @@
-name: PKGBUILD CI
+name: Build and check in clean chroot
 
 on:
   pull_request:
