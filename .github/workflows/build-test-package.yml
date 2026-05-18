@@ -60,7 +60,7 @@ jobs:
         if: steps.pkg.outputs.skip != 'true'
         run: |
           chown -R ab:ab "$GITHUB_WORKSPACE/${{ steps.pkg.outputs.dir }}"
-          sudo -u ab bash -c "cd \"$GITHUB_WORKSPACE/${{ steps.pkg.outputs.dir }}\" && paru -B . --noconfirm"
+          sudo -u ab -D "$GITHUB_WORKSPACE/${{ steps.pkg.outputs.dir }}" paru -B . --noconfirm
 
       - name: Post result comment
         if: always()
