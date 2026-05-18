@@ -28,10 +28,9 @@ check() {
     -p 'no:benchmark'
   )
   cd "$srcdir"/$_name-python-$pkgver
-  trap 'pkill "npm exec prism"' EXIT
+  trap 'pkill -f steady' EXIT
   ./scripts/mock --daemon
   PYTHONPATH=$PWD/src pytest "${pytest_options[@]}" tests
-  trap 'pkill "npm exec prism"' EXIT
 }
 
 package() {
