@@ -11,7 +11,7 @@ _repo='https://github.com/livekit/agents'
 url="$_repo/tree/main/livekit-plugins/livekit-blingfire"
 license=('Apache-2.0')
 depends=('python' 'glibc' 'gcc-libs')
-makedepends=('python-setuptools' 'pybind11' 'python-build' 'python-installer' 'python-wheel')
+makedepends=('python-setuptools' 'pybind11' 'cmake' 'python-build' 'python-installer' 'python-wheel')
 source=("$_repo/archive/refs/tags/${_name//-blingfire/-agents}@$_livekit_agents_ver.tar.gz")
 sha256sums=('46795cb9023ac6b5abaa351ab518420aeab29d91a941fa2285f2600c4e7fd05e')
 
