@@ -3,7 +3,7 @@
 _name=control
 pkgname=python-$_name
 pkgver=0.10.2
-pkgrel=4
+pkgrel=5
 pkgdesc="Python Control Systems Library."
 arch=('any')
 license=('BSD-3-Clause')
