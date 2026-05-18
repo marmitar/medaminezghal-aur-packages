@@ -31,6 +31,7 @@ check() {
   trap 'pkill "npm exec prism"' EXIT
   ./scripts/mock --daemon
   PYTHONPATH=$PWD/src pytest "${pytest_options[@]}" tests
+  trap 'pkill "npm exec prism"' EXIT
 }
 
 package() {
