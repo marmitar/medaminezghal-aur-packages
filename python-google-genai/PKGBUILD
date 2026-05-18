@@ -18,7 +18,6 @@ sha256sums=('726ab56e98e37f4a0ece3ecbadb5b5a0ec36a497b1670c4a55f35a66baa5624a')
 prepare(){
   cd "$srcdir"/${pkgname//google-/}-$pkgver
   sed -i 's/, "twine>=6.1.0", "packaging>=24.2", "pkginfo>=1.12.0"//g' pyproject.toml
-  sed -i 's/, "twine>=6.1.0", "packaging>=24.2", "pkginfo>=1.12.0"//g' ${_name//-//}/types.py
 }
 
 build() {
