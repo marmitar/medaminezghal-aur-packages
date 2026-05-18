@@ -9,16 +9,11 @@ pkgdesc="The missing async toolbox."
 arch=('any')
 url="https://github.com/maxfischer2781/asyncstdlib"
 license=('MIT')
-depends=('python')
+depends=('python' 'python-typing_extensions')
 makedepends=('python-flit-core' 'python-build' 'python-installer' 'python-wheel')
 checkdepends=('python-pytest')
 source=("https://files.pythonhosted.org/packages/source/${_name::1}/$_name/$_name-$pkgver.tar.gz")
 sha256sums=('f99396992a3bba7495d8cf6c832bfe8c8727f61213233d3569a5a9cbd1c04385')
-
-prepare() {
-  cd "$srcdir"/$_name-$pkgver
-  find . -name "*.py" -o -name "*.pyi" -exec sed -i 's/typing_extensions/typing/g' {} +
-}
 
 build() {
   cd "$srcdir"/$_name-$pkgver
