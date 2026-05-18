@@ -1,7 +1,7 @@
 # Maintainer: Mohamed Amine Zghal (medaminezghal) <medaminezghal at outlook dot com>
 
 _name=livekit-blingfire
-pkgname=python-${_name}
+pkgname=python-$_name
 pkgver=1.1.0
 _livekit_agents_ver=1.3.7
 pkgrel=2
