@@ -49,6 +49,7 @@ jobs:
           case "$provider" in
             pypi)   pkgname="python-$project" ;;
             github) pkgname="${project##*/}" ;;
+            gitlab) pkgname="${project##*/}" ;;
             *)
               echo "::error::Unsupported provider: $provider"
               exit 1
