@@ -8,9 +8,9 @@ pkgdesc="Library with a Postgres implementation of LangGraph checkpoint saver."
 arch=('any')
 url="https://github.com/langchain-ai/langgraph/tree/main/libs/checkpoint-postgres"
 license=('MIT')
-depends=('python' 'python-langgraph-checkpoint' 'python-orjson' 'python-psycopg' 'python-psycopg-pool' 'postgresql' 'pgvector')
+depends=('python' 'python-langgraph-checkpoint' 'python-orjson' 'python-psycopg' 'python-psycopg-pool')
 makedepends=('python-hatchling' 'python-build' 'python-installer' 'python-wheel')
-checkdepends=('python-pytest' 'python-anyio' 'python-pytest-asyncio' 'python-pytest-mock')
+checkdepends=('python-pytest' 'python-anyio' 'python-pytest-asyncio' 'python-pytest-mock' 'postgresql' 'pgvector')
 source=("https://files.pythonhosted.org/packages/source/${_name::1}/$_name/${_name//-/_}-$pkgver.tar.gz")
 sha256sums=('02bff4ab63d9dae8eab3a9640fce1d479da8965c9fba7b0dc04cb1f7c56f0a55')
 
