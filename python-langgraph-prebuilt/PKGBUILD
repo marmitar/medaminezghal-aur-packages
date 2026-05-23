@@ -11,7 +11,7 @@ url="$_repo/tree/main/libs/prebuilt"
 license=('MIT')
 depends=('python' 'python-langgraph-checkpoint' 'python-langchain-core')
 makedepends=('python-hatchling' 'python-build' 'python-installer' 'python-wheel')
-checkdepends=('python-pytest' 'python-pytest-asyncio' 'python-pytest-mock' 'python-langgraph-sdk' 'python-xxhash' 'python-pydantic' 'python-langgraph-checkpoint-sqlite' 'python-langgraph-checkpoint-postgres' 'python-syrupy' 'python-psycopg' 'valkey' 'postgresql' 'pgvector')
+checkdepends=('python-pytest' 'python-pytest-asyncio' 'python-pytest-mock' 'python-langgraph-sdk' 'python-xxhash' 'python-pydantic' 'python-langgraph-checkpoint-sqlite' 'python-langgraph-checkpoint-postgres' 'python-syrupy' 'python-psycopg' 'valkey' 'postgresql')
 source=("$_repo/archive/refs/tags/${_name//langgraph-/}==$pkgver.tar.gz")
 sha256sums=('5f5ece963a2ca716b6f454790780e94e148f0292de3ebfd424331886e59c1210')
 
@@ -30,8 +30,7 @@ check() {
     --auth=md5 \
     --no-instructions
   rm -f "$pwfile"
-  sed -i "s/#shared_preload_libraries = ''/shared_preload_libraries = 'vector'/" "$PGDATA"/postgresql.conf
-  sed -i "s/#port = 5432/port = 5441/" "$PGDATA"/postgresql.conf
+  sed -i "s/#port = 5432/port = 5442/" "$PGDATA"/postgresql.conf
   sed -i "s|#unix_socket_directories = '/run/postgresql'|unix_socket_directories = '$PGDATA'|" "$PGDATA"/postgresql.conf
   pg_ctl -D "$PGDATA" -l "$PGDATA"/pg.log start
   local pytest_options=(
