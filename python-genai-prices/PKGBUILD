@@ -17,7 +17,7 @@ sha256sums=('d4c532e961139e63186f28f053fb083fce73db43a6eaac9afa411414e3fa89a5')
 
 prepare() {
   # Fix ValidationError
-  # cd "$srcdir"/$_name-$pkgver
+  cd "$srcdir"/$_name-$pkgver
   # sed -i 's/no_color/color/g' packages/python/genai_prices/_cli_impl.py
   # sed -i 's/no-color/color/g' packages/python/genai_prices/_cli_impl.py
   # sed -i '137s/False/True/' packages/python/genai_prices/_cli_impl.py
