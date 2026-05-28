@@ -38,7 +38,10 @@ jobs:
           [[ -n "$dir" ]] || { echo "::error::No PKGBUILD change detected"; exit 1; }
           [[ -f "$dir/PKGBUILD" ]] || { echo "::error::$dir/PKGBUILD not found"; exit 1; }
 
-          pkgname=$(bash -c "source $dir/PKGBUILD && echo \$pkgname")
+          pkgname=$(bash -c "source $dir/PKGBUILD && echo \$pkgbase")
+          if [[ -z "$pkgname" ]]; then
+            pkgname=$(bash -c "source $dir/PKGBUILD && echo \$pkgname")
+          fi
           pkgver=$(bash -c "source $dir/PKGBUILD && echo \$pkgver")
 
           [[ -n "$pkgname" ]] || { echo "::error::Could not read pkgname from PKGBUILD"; exit 1; }
