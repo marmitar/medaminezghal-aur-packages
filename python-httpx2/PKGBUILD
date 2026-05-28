@@ -17,7 +17,7 @@ sha256sums=('489857b6883a0a14d74e679fa82ea49d0aecf61f5c01de8a4290fdb9099ac5b5')
 
 prepare() {
   cd "$srcdir"/$_name0
-  # Fix until uvicorn updated by Arch maintainers
+  # Fixes until uvicorn updated by Arch maintainers
   sed -i 's/loop="asyncio"/loop="asyncio", ws="none"/' tests/httpx2/conftest.py
   sed -i 's/Transfer-Encoding/transfer-encoding/' tests/httpx2/test_main.py
   sed -i 's/ISO-8859-1/WINDOWS-1252/' tests/httpx2/client/test_client.py
