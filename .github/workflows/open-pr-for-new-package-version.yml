@@ -95,7 +95,7 @@ jobs:
           fi
 
           tmpdir=$(mktemp -d)
-          cp "$pkgdir/PKGBUILD" "$tmpdir/"
+          cp "$pkgdir/*" "$tmpdir/"
           useradd -m tmpbuilder
           chown -R tmpbuilder:tmpbuilder "$tmpdir"
           new_checksums=$(sudo -u tmpbuilder bash -c "cd \"$tmpdir\" && makepkg -g")
