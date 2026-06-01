@@ -10,7 +10,7 @@ url="https://github.com/langchain-ai/langgraph/tree/main/libs/langgraph"
 license=('MIT')
 depends=('python' 'python-langchain-core' 'python-langgraph-checkpoint' 'python-langgraph-sdk' 'python-langgraph-prebuilt' 'python-xxhash' 'python-pydantic')
 makedepends=('python-hatchling' 'python-build' 'python-installer' 'python-wheel')
-checkdepends=('python-pytest' 'python-pytest-mock' 'python-syrupy' 'python-httpx' 'python-pytest-xdist' 'python-psutil' 'python-pytest-repeat' 'python-langgraph-checkpoint-sqlite' 'python-langgraph-checkpoint-postgres' 'python-psycopg' 'python-pycryptodome' 'python-redis' 'valkey' 'postgresql')
+checkdepends=('python-pytest' 'python-pytest-mock' 'python-syrupy' 'python-httpx' 'python-pytest-xdist' 'python-psutil' 'python-langgraph-checkpoint-sqlite' 'python-langgraph-checkpoint-postgres' 'python-psycopg' 'python-pycryptodome' 'python-redis' 'valkey' 'postgresql')
 source=("https://files.pythonhosted.org/packages/source/${_name::1}/$_name/$_name-$pkgver.tar.gz")
 sha256sums=('f54a98458976b3ff0774683867df125fb52d8dbedeb2441d0b0656a51331cee5')
 
