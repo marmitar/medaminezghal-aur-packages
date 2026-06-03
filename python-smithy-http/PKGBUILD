@@ -26,6 +26,7 @@ check() {
     -vv
     --disable-warnings
     --override-ini="addopts="
+    --import-mode=importlib
   )
   cd "$srcdir"/$_name/packages/$_name
   PYTHONPATH=$PWD/src pytest "${pytest_options[@]}" tests
