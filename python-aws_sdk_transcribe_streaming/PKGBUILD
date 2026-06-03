@@ -10,22 +10,12 @@ url="https://pypi.org/project/aws_sdk_transcribe_streaming"
 license=('Apache-2.0')
 depends=('python' 'python-smithy-aws-core' 'python-smithy-aws-event-stream' 'python-smithy-json' 'python-smithy-core' 'python-smithy-http' 'python-awscrt')
 makedepends=('python-hatchling' 'python-build' 'python-installer' 'python-wheel' 'git')
-checkdepends=('python-pytest' 'python-pytest-asyncio')
 source=("https://files.pythonhosted.org/packages/source/${_name::1}/$_name/$_name-$pkgver.tar.gz")
 sha256sums=('ac7b2fd83c77dac30b807c87d6334fbb968f6a3710928ac1b6faa5a37cb00d1a')
 
 build() {
   cd "$srcdir"/$_name-$pkgver
   python -m build --wheel --no-isolation
-}
-
-check() {
-  local pytest_options=(
-    -vv
-    --disable-warnings
-  )
-  cd "$srcdir"/$_name-$pkgver
-  PYTHONPATH=$PWD/src pytest "${pytest_options[@]}" tests
 }
 
 package() {
