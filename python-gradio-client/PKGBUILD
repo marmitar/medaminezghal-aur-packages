@@ -15,12 +15,12 @@ source=("https://files.pythonhosted.org/packages/source/${_name:0:1}/$_name/${_n
 sha256sums=('4cde99bad62149595c30c90876ca2e405e3a13687ecf895474f3412cb476673d')
 
 build() {
-  cd "$srcdir"/$_name-$pkgver
+  cd "$srcdir"/${_name//-/_}-$pkgver
   python -m build --wheel --no-isolation
 
 }
 
 package() {
-  cd "$srcdir"/$_name-$pkgver
+  cd "$srcdir"/${_name//-/_}-$pkgver
   python -m installer --destdir="$pkgdir" dist/*.whl
 }
