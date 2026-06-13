@@ -11,8 +11,8 @@ license=('MIT')
 depends=('python' 'python-pytest')
 makedepends=('python-setuptools' 'python-build' 'python-installer' 'python-wheel')
 checkdepends=('python-pytest')
-source=("https://files.pythonhosted.org/packages/source/${_name:0:1}/$_name/${_name//-/_}-$pkgver.tar.gz")
-sha256sums=('35d5aab732746deb0f3d806a9261b47f0567410f5fa4ad8785e992d0df09f424')
+source=("$url/archive/refs/tags/$pkgver.tar.gz")
+sha256sums=('63ee2f8313e3cb6e7421221a6acc06b33fe2f597c192ca2d49fb586f36ab9278')
 
 build() {
   cd "$srcdir"/${_name//-/_}-$pkgver
@@ -23,7 +23,6 @@ check() {
   local pytest_options=(
     -vv
     --disable-warnings
-    -p 'no:subtests'
   )
   cd "$srcdir"/${_name//-/_}-$pkgver
   PYTHONPATH=$PWD pytest "${pytest_options[@]}" tests
