@@ -23,7 +23,6 @@ check() {
   local pytest_options=(
     -vv
     --disable-warnings
-    -p pytester
   )
   cd "$srcdir"/${_name//-/_}-$pkgver
   PYTHONPATH=$PWD pytest "${pytest_options[@]}" tests
