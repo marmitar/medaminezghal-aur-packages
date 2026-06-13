@@ -15,7 +15,7 @@ source=("$url/archive/refs/tags/$pkgver.tar.gz")
 sha256sums=('63ee2f8313e3cb6e7421221a6acc06b33fe2f597c192ca2d49fb586f36ab9278')
 
 build() {
-  cd "$srcdir"/${_name//-/_}-$pkgver
+  cd "$srcdir"/$_name-$pkgver
   python -m build --wheel --no-isolation
 }
 
@@ -24,11 +24,11 @@ check() {
     -vv
     --disable-warnings
   )
-  cd "$srcdir"/${_name//-/_}-$pkgver
+  cd "$srcdir"/$_name-$pkgver
   PYTHONPATH=$PWD pytest "${pytest_options[@]}" tests
 }
 
 package() {
-  cd "$srcdir"/${_name//-/_}-$pkgver
+  cd "$srcdir"/$_name-$pkgver
   python -m installer --destdir="$pkgdir" dist/*.whl
 }
