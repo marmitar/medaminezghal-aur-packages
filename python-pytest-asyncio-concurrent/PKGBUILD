@@ -10,7 +10,7 @@ url='https://github.com/czl9707/pytest-asyncio-concurrent'
 license=('MIT')
 depends=('python' 'python-pytest')
 makedepends=('python-setuptools' 'python-build' 'python-installer' 'python-wheel')
-checkdepends=('python-pytest')
+checkdepends=('python-pytest' 'python-pytest-asyncio')
 source=("$url/archive/refs/tags/$pkgver.tar.gz"
         "python314-event-loop.patch")
 sha256sums=('63ee2f8313e3cb6e7421221a6acc06b33fe2f597c192ca2d49fb586f36ab9278'
