@@ -99,25 +99,28 @@ jobs:
           useradd -m tmpbuilder
           chown -R tmpbuilder:tmpbuilder "$tmpdir"
           new_checksums=$(sudo -u tmpbuilder bash -c "cd \"$tmpdir\" && makepkg -g")
-          [[ -n "$new_checksums" ]] || { echo "::error::makepkg -g failed"; exit 1; }
 
-          cd "$pkgdir"
-          awk -v new="$new_checksums" '
-            /^sha[0-9a-z]*sums(_[a-z0-9_]+)?=/ {
-              if (!inserted) {
-                print new
-                inserted=1
+          if [[ -n "$new_checksums" ]]; then
+            cd "$pkgdir"
+            awk -v new="$new_checksums" '
+              /^sha[0-9a-z]*sums(_[a-z0-9_]+)?=/ {
+                if (!inserted) {
+                  print new
+                  inserted=1
+                }
+                in_block=1
+                if (/\)$/) in_block=0
+                next
               }
-              in_block=1
-              if (/\)$/) in_block=0
-              next
-            }
-            in_block {
-              if (/\)/) in_block=0
-              next
-            }
-            { print }
-          ' PKGBUILD > PKGBUILD.tmp && mv PKGBUILD.tmp PKGBUILD
+              in_block {
+                if (/\)/) in_block=0
+                next
+              }
+              { print }
+            ' PKGBUILD > PKGBUILD.tmp && mv PKGBUILD.tmp PKGBUILD
+          else
+            echo "No generic sources to checksum, keeping existing checksums."
+          fi
 
       - name: Create pull request
         if: steps.resolve.outputs.skip == 'false'
