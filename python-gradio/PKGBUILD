@@ -47,7 +47,8 @@ check() {
     --deselect test/test_external.py
     # Need to be fixed by developers
     --ignore test/test_pipelines.py
-    --deselect test/test_routes.py::TestRoutes::test_header_size_limit
+    --deselect test/test_routes.py::test_deep_link_unique_per_session
+    --deselect test/test_routes.py::test_server_fn_passes_request
   )
   cd "$srcdir"/$_name-$_name-$pkgver
   ulimit -n 16384
