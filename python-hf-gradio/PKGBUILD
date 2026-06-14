@@ -3,7 +3,7 @@
 _name=hf-gradio
 pkgname=python-$_name
 pkgver=0.4.1
-pkgrel=2
+pkgrel=1
 pkgdesc='An extension of the Hugging Face CLI for interacting with Gradio Spaces and Apps.'
 arch=('any')
 url='https://github.com/gradio-app/hf-gradio'
