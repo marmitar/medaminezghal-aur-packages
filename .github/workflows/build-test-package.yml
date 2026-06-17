@@ -51,7 +51,11 @@ jobs:
             exit 0
           fi
 
-          [[ -f "$dir/PKGBUILD" ]] || { echo "::error::$dir/PKGBUILD not found"; exit 1; }
+          if [[ ! -f "$dir/PKGBUILD" ]]; then
+            echo "PKGBUILD deleted — skipping build check."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
 
           echo "dir=$dir" >> "$GITHUB_OUTPUT"
           echo "Package to build: $dir"
