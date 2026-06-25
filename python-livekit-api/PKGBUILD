@@ -30,6 +30,6 @@ check() {
 }
 
 package() {
-  cd "$srcdir"/python-sdks-${_name//livekit-/}-v$pkgver
+  cd "$srcdir"/python-sdks-${_name//livekit-/}-v$pkgver/$_name
   python -m installer --destdir="$pkgdir" dist/*.whl
 }
