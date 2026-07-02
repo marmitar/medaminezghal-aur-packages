@@ -2,7 +2,7 @@
 
 _name=exa-py
 pkgname=python-$_name
-pkgver=2.15.0
+pkgver=2.16.0
 pkgrel=1
 pkgdesc="Python SDK for Exa API."
 arch=('any')
@@ -11,7 +11,7 @@ license=('MIT')
 depends=('python' 'python-requests' 'python-openai' 'python-pydantic' 'python-httpx' 'python-httpcore' 'python-dotenv')
 makedepends=('python-poetry-core' 'python-build' 'python-installer' 'python-wheel')
 source=("https://files.pythonhosted.org/packages/source/${_name::1}/$_name/${_name//-/_}-$pkgver.tar.gz")
-sha256sums=('8b3c3dbfe78e57b116e1ef50dec35c921519fb6cee94ed6c986d707b89de44fb')
+sha256sums=('dce0db698720b1b7b39b58a1a17ad65fcc5969ee47f810cff5bcc836aeb0f777')
 
 build() {
     cd "$srcdir"/${_name//-/_}-$pkgver
