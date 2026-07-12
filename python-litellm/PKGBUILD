@@ -12,7 +12,7 @@ pkgdesc='Library to easily interface with LLM API providers.'
 arch=('any')
 url='https://github.com/BerriAI/litellm'
 license=('MIT')
-depends=('python' 'python-fastuuid' 'python-httpx' 'python-openai' 'python-dotenv' 'python-tiktoken' 'python-importlib-metadata' 'python-tokenizers' 'python-click' 'python-jinja' 'python-aiohttp' 'python-pydantic' 'python-jsonschema')
+depends=('python' 'glibc' 'libgcc' 'python-fastuuid' 'python-httpx' 'python-openai' 'python-dotenv' 'python-tiktoken' 'python-importlib-metadata' 'python-tokenizers' 'python-click' 'python-jinja' 'python-aiohttp' 'python-pydantic' 'python-jsonschema')
 makedepends=('python-maturin' 'python-build' 'python-installer' 'python-wheel')
 optdepends=('gunicorn: proxy' 'uvicorn: proxy' 'python-granian: proxy' 'python-uvloop: proxy' 'python-fastapi: proxy' 'python-starlette: proxy' 'python-backoff: proxy' 'python-pyyaml: proxy' 'python-rq: proxy' 'python-orjson: proxy' 'python-apscheduler: proxy' 'python-fastapi-sso: proxy' 'python-pyjwt: proxy' 'python-python-multipart: proxy' 'python-cryptography: proxy' 'python-pynacl: proxy' 'python-websockets: proxy' 'python-boto3: proxy' 'python-azure-identity: proxy' 'python-azure-storage-blob: proxy' 'python-mcp: proxy' 'python-litellm-proxy-extras: proxy' 'python-litellm-enterprise: proxy' 'python-restrictedpython: proxy' 'python-rich: proxy' 'python-polars: proxy' 'python-soundfile: proxy' 'python-pyroscope-io: proxy' 'python-pydantic-settings: proxy' 'python-expression: proxy'
             'python-rich: cli' 'python-pyyaml: cli' 'python-requests: cli'
@@ -37,7 +37,7 @@ prepare() {
 
 build() {
   cd "$srcdir"/$_name-$pkgver
-  python -m build --wheel --no-isolation
+  PYO3_USE_ABI3_FORWARD_COMPATIBILITY=1 python -m build --wheel --no-isolation
 }
 
 package() {
