@@ -38,11 +38,7 @@ check() {
   )
   cd "$srcdir"/$_name-$pkgver
   python -m venv --system-site-packages test-env
-  cp -f prices/data.schema.json test-env/lib/python$python_version/data.schema.json
-  cp -f prices/data.json test-env/lib/python$python_version/data.json
-  cp -f prices/data_slim.json test-env/lib/python$python_version/data_slim.json
   test-env/bin/python -m installer packages/python/dist/*.whl
-  test-env/bin/python -m installer prices/dist/*.whl
   PYTHONPATH=$PYTHONPATH:$PWD/prices test-env/bin/python -P -m pytest "${pytest_options[@]}" tests
 }
 
