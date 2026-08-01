@@ -43,5 +43,5 @@ check() {
 
 package() {
   cd "$srcdir"/$_name-$pkgver
-  python -m installer --destdir="$pkgdir" packages/pythondist/*.whl
+  python -m installer --destdir="$pkgdir" packages/python/dist/*.whl
 }
