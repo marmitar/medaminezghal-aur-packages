@@ -18,7 +18,6 @@ sha256sums=('c9d1d164420b8d080bf596dbe9493da1d87ef1b52010b4af591c2fd88499f462')
 prepare() {
   # Fix ValidationError
   cd "$srcdir"/$_name-$pkgver
-  sed -i '$a \\n[build-system]\nrequires = ["uv_build>=0.12.1,<0.13"]\nbuild-backend = "uv_build"\n' pyproject.toml
   # sed -i 's/no_color/color/g' packages/python/genai_prices/_cli.py
   # sed -i 's/no-color/color/g' packages/python/genai_prices/_cli.py
   # sed -i '137s/False/True/' packages/python/genai_prices/_cli.py
@@ -28,7 +27,6 @@ prepare() {
 
 build() {
     cd "$srcdir"/$_name-$pkgver
-    python -m build --wheel --no-isolation --skip-dependency-check
     python -m build --wheel --no-isolation --skip-dependency-check packages/python
 }
 
@@ -39,8 +37,8 @@ check() {
   )
   cd "$srcdir"/$_name-$pkgver
   python -m venv --system-site-packages test-env
-  test-env/bin/python -m installer dist/*.whl
-  test-env/bin/python -P -m pytest "${pytest_options[@]}" tests
+  test-env/bin/python -m installer packages/python/dist/*.whl
+  PYTHONPATH="$PWS/prices:$PYTHONPATH" test-env/bin/python -P -m pytest "${pytest_options[@]}" tests
 }
 
 package() {
