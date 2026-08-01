@@ -15,16 +15,6 @@ optdepends=('python-pydantic-settings: cli' 'python-rich: cli' 'python-rich-argp
 source=("$url/archive/refs/tags/v$pkgver.tar.gz")
 sha256sums=('c9d1d164420b8d080bf596dbe9493da1d87ef1b52010b4af591c2fd88499f462')
 
-prepare() {
-  # Fix ValidationError
-  cd "$srcdir"/$_name-$pkgver
-  # sed -i 's/no_color/color/g' packages/python/genai_prices/_cli.py
-  # sed -i 's/no-color/color/g' packages/python/genai_prices/_cli.py
-  # sed -i '137s/False/True/' packages/python/genai_prices/_cli.py
-  # sed -i 's/not args.color/args.color/g' packages/python/genai_prices/_cli.py
-  # sed -i 's/--no-color/--color/g' tests/test_cli.py
-}
-
 build() {
     cd "$srcdir"/$_name-$pkgver
     python -m build --wheel --no-isolation --skip-dependency-check packages/python
