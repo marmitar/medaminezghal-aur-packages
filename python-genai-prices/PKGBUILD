@@ -18,17 +18,15 @@ sha256sums=('c9d1d164420b8d080bf596dbe9493da1d87ef1b52010b4af591c2fd88499f462')
 prepare() {
   # Fix ValidationError
   cd "$srcdir"/$_name-$pkgver
-  sed -i 's/no_color/color/g' packages/python/genai_prices/_cli.py
-  sed -i 's/no-color/color/g' packages/python/genai_prices/_cli.py
-  sed -i '137s/False/True/' packages/python/genai_prices/_cli.py
-  sed -i 's/not args.color/args.color/g' packages/python/genai_prices/_cli.py
-  sed -i 's/--no-color/--color/g' tests/test_cli.py
+  # sed -i 's/no_color/color/g' packages/python/genai_prices/_cli.py
+  # sed -i 's/no-color/color/g' packages/python/genai_prices/_cli.py
+  # sed -i '137s/False/True/' packages/python/genai_prices/_cli.py
+  # sed -i 's/not args.color/args.color/g' packages/python/genai_prices/_cli.py
+  # sed -i 's/--no-color/--color/g' tests/test_cli.py
 }
 
 build() {
     cd "$srcdir"/$_name-$pkgver/packages/python
-    python -m build --wheel --no-isolation --skip-dependency-check
-    cd "$srcdir"/$_name-$pkgver/prices
     python -m build --wheel --no-isolation --skip-dependency-check
 }
 
@@ -45,7 +43,7 @@ check() {
   cp -f prices/data_slim.json test-env/lib/python$python_version/data_slim.json
   test-env/bin/python -m installer packages/python/dist/*.whl
   test-env/bin/python -m installer prices/dist/*.whl
-  test-env/bin/python -m pytest "${pytest_options[@]}" tests
+  PYTHONPATH=$PYTHONPATH:$PWD/prices test-env/bin/python -P -m pytest "${pytest_options[@]}" tests
 }
 
 package() {
