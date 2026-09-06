@@ -21,8 +21,6 @@ jobs:
       volumes:
         - /etc/machine-id:/etc/machine-id:ro
         - /run/dbus:/run/dbus
-    permissions:
-      pull-requests: write
 
     steps:
       - name: Update system
@@ -75,7 +73,7 @@ jobs:
           chown -R ab:ab "$GITHUB_WORKSPACE"
           sudo -u ab -D "$GITHUB_WORKSPACE/${{ steps.pkg.outputs.dir }}" paru -B . --noconfirm
 
-      - name: Post result comment
+      - name: Write result summary
         if: always()
         uses: actions/github-script@v8
         with:
@@ -84,10 +82,11 @@ jobs:
             const pkg     = '${{ steps.pkg.outputs.dir }}' || 'unknown';
             const icon    = success ? '✅' : '❌';
             const status  = success ? 'Build and tests passed' : 'Build or tests failed';
+            const message = `## ${icon} PKGBUILD CI — ${status}
 
-            github.rest.issues.createComment({
-              owner:        context.repo.owner,
-              repo:         context.repo.repo,
-              issue_number: context.issue.number,
-              body: `## ${icon} PKGBUILD CI — ${status}\n\n**Package:** \`${pkg}\`\n*Commit: ${{ github.sha }}*`
-            });
+            **Package:** \`${pkg}\`
+            *Commit: ${{ github.sha }}*`;
+
+            core.summary.addRaw(message);
+            core.summary.addEOL();
+            core.summary.write();
