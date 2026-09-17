@@ -14,7 +14,7 @@ on:
         required: true
 
 concurrency:
-  group: ci-${{ github.event.pull_request.number }}
+  group: ci-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -77,17 +77,21 @@ jobs:
 
       - name: Build & Test package
         if: steps.pkg.outputs.skip != 'true'
+        env:
+          PKG: ${{ inputs.package || steps.pkg.outputs.dir }}
         run: |
           chown -R ab:ab "$GITHUB_WORKSPACE"
-          sudo -u ab -D "$GITHUB_WORKSPACE/${{ inputs.package || steps.pkg.outputs.dir }}" paru -B . --noconfirm
+          sudo -u ab -D "$GITHUB_WORKSPACE/$PKG" paru -B . --noconfirm
 
       - name: Write result summary
         if: always()
         uses: actions/github-script@v8
+        env:
+          PKG: ${{ inputs.package || steps.pkg.outputs.dir }}
         with:
           script: |
             const success = '${{ job.status }}' === 'success';
-            const pkg     = '${{ inputs.package || steps.pkg.outputs.dir }}' || 'unknown';
+            const pkg     = process.env.PKG || 'unknown';
             const icon    = success ? '✅' : '❌';
             const status  = success ? 'Build and tests passed' : 'Build or tests failed';
             const message = `## ${icon} PKGBUILD CI — ${status}
@@ -97,4 +101,4 @@ jobs:
 
             core.summary.addRaw(message);
             core.summary.addEOL();
-            core.summary.write();
+            await core.summary.write();
