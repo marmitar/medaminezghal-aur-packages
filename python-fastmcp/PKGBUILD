@@ -53,7 +53,9 @@ makedepends=('python-hatchling'
 #               'python-pydantic-monty'
 #               'python-google-genai'
 #               'python-jsonref'    
-#               'python-openai')
+#               'python-openai'
+#               'python-cryptography'
+#               'python-pydocket')
 source=("$_name0::git+$_repo.git#tag=v$pkgver")
 sha256sums=('56462ad6249dc6640473a358e7f6f4f54b83e8e50489b157f0b33ba40d311a1f')
 
