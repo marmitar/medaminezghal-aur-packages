@@ -14,7 +14,12 @@ arch=('any')
 _repo='https://github.com/PrefectHQ/fastmcp'
 license=('Apache-2.0')
 depends=('python')
-makedepends=('python-hatchling' 'python-uv-dynamic-versioning' 'python-build' 'python-installer' 'python-wheel' 'git')
+makedepends=('python-hatchling'
+             'python-uv-dynamic-versioning'
+             'python-build'
+             'python-installer'
+             'python-wheel'
+             'git')
 # checkdepends=()
 source=("$_name0::git+$_repo.git#tag=v$pkgver")
 sha256sums=('56462ad6249dc6640473a358e7f6f4f54b83e8e50489b157f0b33ba40d311a1f')
@@ -37,7 +42,13 @@ build() {
 
 package_python-fastmcp-slim() {
   pkgdesc='The dependency-slim FastMCP package.'
-  depends+=('python-mcp-types' 'python-platformdirs' 'python-pydantic' 'python-email-validator' 'python-pydantic-settings' 'python-dotenv' 'python-rich' 'python-typing_extensions')
+  depends+=('python-mcp-types'
+            'python-platformdirs'
+            'python-pydantic'
+            'python-email-validator'
+            'python-pydantic-settings'
+            'python-dotenv' 'python-rich'
+            'python-typing_extensions')
   optdepends=('python-anthropic: anthropic'
   
               'python-prefab-ui: apps'
