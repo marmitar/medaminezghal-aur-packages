@@ -1,17 +1,17 @@
 # Maintainer: Mohamed Amine Zghal (medaminezghal) <medaminezghal at outlook dot com>
 
-_name=livekit-protocol
+_name=logfire-api
 pkgname=python-$_name
-pkgver=1.1.27
+pkgver=5.1.0
 pkgrel=1
-pkgdesc='Python protocol stubs for LiveKit.'
+pkgdesc='Shim for the Logfire SDK which does nothing unless Logfire is installed.'
 arch=('any')
-url='https://github.com/livekit/python-sdks/tree/main/livekit-protocol'
-license=('Apache-2.0')
-depends=('python' 'python-protobuf')
+url='https://github.com/pydantic/logfire/tree/main/logfire-api'
+license=('MIT')
+depends=('python')
 makedepends=('python-hatchling' 'python-build' 'python-installer' 'python-wheel')
-source=("https://files.pythonhosted.org/packages/source/${_name:0:1}/$_name/${_name//-/_}-$pkgver.tar.gz")
-sha256sums=('740a4c6e438da763d204f2a6b0fc8f7f33ca96e27b17ce9abc6557dbb0a28dbd')
+source=("https://files.pythonhosted.org/packages/source/${_name::1}/$_name/${_name//-/_}-$pkgver.tar.gz")
+sha256sums=('16abf9d7d35e08cda2dab66fd0883cabaa4d4206f3dcea0f5967dbc823f01d6d')
 
 build() {
   cd "$srcdir"/${_name//-/_}-$pkgver
